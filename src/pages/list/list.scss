@@ -1,0 +1,38 @@
+.list{
+    display: flex;
+    width: 100%;
+    .list__container{
+        flex: 6;
+        .datatable__container{
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            .datatable__top{
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                color: #333;
+                h1{
+                    font: {
+                        size: 28px;
+                        weight: 600;
+                    };
+                }
+                .datatable__add{
+                    display: flex;
+                    align-items: center;
+                    padding: 5px 15px;
+                    background: #7451f8;
+                    border-radius: 5px;
+                    color: #fff;
+                    font-size: 16px;
+                    gap: 5px;
+                    .icon{
+                        font-size: 18px;
+                    }
+                }
+            }
+        }
+    }
+}

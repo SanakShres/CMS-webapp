@@ -1,0 +1,25 @@
+.table__cell{
+    .cell__wrapper{
+        display: flex;
+        align-items: center;
+        img{
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+    }
+    .status{
+        padding: 5px 15px;
+        border-radius: 15px;
+        &.Approved{
+            color: #00B874;
+            background-color: #EAFFED;
+        }
+        &.Pending{
+            color: #E09B01;
+            background-color: #FDF9ED;
+        }
+    }
+}
