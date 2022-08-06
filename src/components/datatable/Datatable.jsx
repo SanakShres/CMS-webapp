@@ -4,6 +4,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { userColumns, userRows } from "../../dataTableSource";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { Link } from "react-router-dom";
 
 const Datatable = () => {
   const actionColumn = [
@@ -14,9 +15,11 @@ const Datatable = () => {
       renderCell: () => {
         return (
           <div className="cellAction">
-            <div className="cellAction__icon">
-              <VisibilityIcon className="icon" />
-            </div>
+            <Link to="/users/test" style={{ textDecoration: "none" }}>
+              <div className="cellAction__icon">
+                <VisibilityIcon className="icon" />
+              </div>
+            </Link>
             <div className="cellAction__icon">
               <DeleteIcon className="icon" />
             </div>

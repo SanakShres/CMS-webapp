@@ -37,10 +37,10 @@ const data = [
   },
 ];
 
-const Chart = () => {
+const Chart = ({ height, title }) => {
   return (
-    <div className="chart">
-      <div className="chart__title">Last 6 months (Revenue in '000)</div>
+    <div className="chart" style={{ height: height ? "100%" : "" }}>
+      <div className="chart__title">{title}</div>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           width={730}

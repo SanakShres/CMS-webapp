@@ -22,7 +22,7 @@ const home = () => {
           </div>
           <div className="charts__container">
             <FeaturedChart />
-            <Chart />
+            <Chart title="Last 6 months (Revenue in '000)" />
           </div>
           <div className="list__container">
             <div className="list__table">

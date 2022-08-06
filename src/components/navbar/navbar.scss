@@ -11,13 +11,16 @@
         justify-content: space-between;
         padding: 15px;
         width: 100%;
+        gap: 15px;
         .navbar__search{
+            flex: 1;
             display: flex;
             align-items: center;
-            border: 1px solid #dadada;
+            // border: 1px solid #dadada;
+            // border-radius: 5px;
             padding: 5px;
-            border-radius: 5px;
             input{
+                flex: 1;
                 border: 0;
                 outline: 0;
                 background: transparent;
@@ -27,6 +30,7 @@
             }
             .search__icon{
                 font-size: 20px;
+                margin-right: 5px;
             }
         }
         .navbar__items{

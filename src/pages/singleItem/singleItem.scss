@@ -3,20 +3,110 @@
     width: 100%;
     .singleItem__container{
         flex: 6;
+        .top__bgcover{
+            width: 100%;
+            margin-bottom: -100px;
+            img{
+                width: inherit;
+                height: 250px;
+                object-fit: cover;
+            }
+        }
         .singleItem__top{
-            position: relative;
-            padding: 30px;
+            padding: 15px 30px;
             display: flex;
             gap: 15px;
-            .top__bgcover{
-                position: absolute;
-                width: 100%;
-                top: 0;
-                left: 0;
-                img{
-                    width: inherit;
-                    height: 250px;
-                    object-fit: cover;
+            color: #333;
+            .singleItem__left{
+                background: #fff;
+                padding: 15px;
+                -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
+                box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+                flex: 1;
+                .left__title{
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 15px;
+                    h1{
+                        font: {
+                            size: 18px;
+                            weight: 600;
+                        }
+                    }
+                    .item__editBtn{
+                        border-radius: 5px;
+                        padding: 5px 15px;
+                        font-size: 12px;
+                        background: #ece8ff;
+                        color: #7451f8;
+                        cursor: pointer;
+                    }
+                }
+                .left__item{
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 15px;
+                    .item__img{
+                        width: 150px;
+                        height: 150px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                        object-position: 50% 30%;
+                    }
+                    .item__details{
+                        text-align: center;
+                        .item__title{
+                            margin-bottom: 15px;
+                            border-bottom: 1px solid #999;
+                            h2{
+                                font: {
+                                    size: 22px;
+                                    weight: 600;
+                                }
+                            }
+                            h4{
+                                color: #999;
+                                font: {
+                                    size: 16px;
+                                    weight: 600;
+                                }
+                            }
+                        }
+                        .item__info{
+                            color: #999;
+                            margin-bottom: 5px;
+                            font-size: 14px;
+                            .itemKey{
+                                font-weight: bold;
+                                margin-right: 5px;
+                            }
+                            .itemValue{
+                                font-weight: 300;
+                            }
+                        }
+                    }
+                }
+            }
+            .singleItem__right{
+                flex: 2; 
+                background: #fff;
+            }
+        }
+        .singleItem__bottom{
+            padding: 15px 30px;
+            color: #333;
+            .singleItem__table{
+                padding: 15px;
+                -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
+                box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+                .table__title{
+                    margin-bottom: 15px;
+                    font: {
+                        size: 18px;
+                        weight: 600;
+                    }
                 }
             }
         }

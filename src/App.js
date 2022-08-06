@@ -5,10 +5,12 @@ import Login from "./pages/login/Login";
 import List from "./pages/list/List";
 import SingleItem from "./pages/singleItem/SingleItem";
 import New from "./pages/new/New";
+import { bookingInputs, userInputs } from "./formSource";
+import "./styles/dark.scss";
 
 function App() {
   return (
-    <div className="App">
+    <div className="app dark">
       <Router>
         <Routes>
           <Route path="/">
@@ -17,12 +19,18 @@ function App() {
             <Route path="users">
               <Route index element={<List />} />
               <Route path=":userId" element={<SingleItem />} />
-              <Route path="new" element={<New />} />
+              <Route
+                path="new"
+                element={<New inputs={userInputs} title="Add New User" />}
+              />
             </Route>
-            <Route path="products">
+            <Route path="bookings">
               <Route index element={<List />} />
-              <Route path=":productId" element={<SingleItem />} />
-              <Route path="new" element={<New />} />
+              <Route path=":bookingId" element={<SingleItem />} />
+              <Route
+                path="new"
+                element={<New inputs={bookingInputs} title="Add New Booking" />}
+              />
             </Route>
           </Route>
         </Routes>

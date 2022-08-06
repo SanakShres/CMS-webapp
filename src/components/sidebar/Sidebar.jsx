@@ -12,39 +12,50 @@ import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { Link } from "react-router-dom";
 
 const Sidebar = () => {
   return (
     <div className="sidebar">
       <div className="sidebar__top">
-        <span className="logo">
-          <img
-            className="header__icon"
-            src="https://www.hicom.fr/wp-content/uploads/2017/09/Logo_TV_2015.png"
-            alt=""
-          />
-        </span>
+        <Link to="/" style={{ textDecoration: "none" }}>
+          <span className="logo">
+            <img
+              className="header__icon"
+              src="https://www.hicom.fr/wp-content/uploads/2017/09/Logo_TV_2015.png"
+              alt=""
+            />
+          </span>
+        </Link>
       </div>
       <div className="sidebar__center">
         <ul className="sidebar__nav">
           <p className="title">Main</p>
-          <li>
-            <DashboardIcon className="icon" />
-            <span>Dashboard</span>
-          </li>
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <li>
+              <DashboardIcon className="icon" />
+              <span>Dashboard</span>
+            </li>
+          </Link>
           <p className="title">List</p>
-          <li>
-            <PeopleIcon className="icon" />
-            <span>Users</span>
-          </li>
-          <li>
-            <AddShoppingCartIcon className="icon" />
-            <span>Products</span>
-          </li>
-          <li>
-            <CreditCardIcon className="icon" />
-            <span>Orders</span>
-          </li>
+          <Link to="/users" style={{ textDecoration: "none" }}>
+            <li>
+              <PeopleIcon className="icon" />
+              <span>Users</span>
+            </li>
+          </Link>
+          <Link to="/products" style={{ textDecoration: "none" }}>
+            <li>
+              <AddShoppingCartIcon className="icon" />
+              <span>Products</span>
+            </li>
+          </Link>
+          <Link to="/bookings" style={{ textDecoration: "none" }}>
+            <li>
+              <CreditCardIcon className="icon" />
+              <span>Bookings</span>
+            </li>
+          </Link>
           <p className="title">Useful</p>
           <li>
             <InsertChartIcon className="icon" />

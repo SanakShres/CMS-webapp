@@ -13,8 +13,8 @@ export const Navbar = () => {
     <div className="navbar">
       <div className="navbar__wrapper">
         <div className="navbar__search">
-          <input type="text" placeholder="Search..." />
           <SearchIcon className="search__icon" />
+          <input type="text" placeholder="Type in to Search..." />
         </div>
         <div className="navbar__items">
           <div className="navbar__item">
