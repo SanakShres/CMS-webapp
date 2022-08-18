@@ -1,0 +1,72 @@
+.newVenue{
+    display: flex;
+    width: 100%;
+    .newVenue__container{
+        flex: 6;
+        .newVenue__containerInner{
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px;
+            .newVenue__top{
+                h1{
+                    font: {
+                        size: 24px;
+                        weight: 600;
+                    }
+                }
+            }
+            .newVenue__bottom{
+                display: flex;
+                gap: 15px;
+                min-height: 75vh;
+                .newVenue__tabs{
+                    width: 20%;
+                    // flex: 1;
+                    background-color: #7451f8;
+                    color: #fff;
+                    -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
+                    box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+                    ul{
+                        list-style: none;
+                        li{
+                            font: {
+                                size: 14px;
+                                weight: 600;
+                            }
+                            display: block;
+                            padding: 15px;
+                            cursor: pointer;
+                            &:hover{
+                                background-color: #ece8ff;
+                                color: #333;
+                            }
+                            &.active__tabs{
+                                background-color: #ece8ff;
+                                color: #7451f8;
+                            }
+                        }
+                    }
+                }
+                .newVenue__formHolder{
+                    flex: 3;
+                    color: #333;
+                    -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
+                    box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+                    padding: 15px;
+                    display: none;
+                    &.active__form{
+                        display: block;
+                    }
+                    h3{
+                        margin-bottom: 30px;
+                        font: {
+                            size: 20px;
+                            weight: 600;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

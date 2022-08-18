@@ -58,8 +58,8 @@ const Chart = ({ height, title }) => {
               <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
             </linearGradient> */}
           </defs>
-          <XAxis dataKey="name" stroke="#333" />
-          <YAxis stroke="#333" />
+          <XAxis dataKey="name" stroke="#999" />
+          <YAxis stroke="#999" />
           <CartesianGrid strokeDasharray="3 3" className="chart__grid" />
           <Tooltip />
           <Area

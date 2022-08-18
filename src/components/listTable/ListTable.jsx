@@ -63,7 +63,7 @@ const rows = [
 
 const ListTable = () => {
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} className="table__container">
       <Table aria-label="simple table">
         <TableHead>
           <TableRow>

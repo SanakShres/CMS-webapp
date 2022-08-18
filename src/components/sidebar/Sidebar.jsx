@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./sidebar.scss";
 
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -12,9 +12,28 @@ import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { DarkModeContext } from "../../context/darkModeContext";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase";
+import { AuthContext } from "../../context/AuthContext";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+  const { dispatch } = useContext(DarkModeContext);
+  const { dispatch: authDispatch } = useContext(AuthContext);
+
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        authDispatch({ type: "LOGOUT" });
+        navigate("/login");
+      })
+      .catch((error) => {
+        console.log("An error happened.");
+      });
+  };
+
   return (
     <div className="sidebar">
       <div className="sidebar__top">
@@ -44,10 +63,10 @@ const Sidebar = () => {
               <span>Users</span>
             </li>
           </Link>
-          <Link to="/products" style={{ textDecoration: "none" }}>
+          <Link to="/venues" style={{ textDecoration: "none" }}>
             <li>
               <AddShoppingCartIcon className="icon" />
-              <span>Products</span>
+              <span>Venues</span>
             </li>
           </Link>
           <Link to="/bookings" style={{ textDecoration: "none" }}>
@@ -83,15 +102,21 @@ const Sidebar = () => {
             <AccountCircleIcon className="icon" />
             <span>Profile</span>
           </li>
-          <li>
+          <li onClick={handleLogout}>
             <LogoutIcon className="icon" />
             <span>Logout</span>
           </li>
         </ul>
       </div>
       <div className="sidebar__bottom">
-        <div className="colorTheme"></div>
-        <div className="colorTheme"></div>
+        <div
+          className="colorTheme"
+          onClick={() => dispatch({ type: "LIGHT" })}
+        ></div>
+        <div
+          className="colorTheme"
+          onClick={() => dispatch({ type: "DARK" })}
+        ></div>
       </div>
     </div>
   );

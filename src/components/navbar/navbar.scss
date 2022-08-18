@@ -24,6 +24,7 @@
                 border: 0;
                 outline: 0;
                 background: transparent;
+                color: #999;
                 &::placeholder{
                     font-size: 12px;
                 }
@@ -36,6 +37,7 @@
         .navbar__items{
             display: flex;
             align-items: center;
+            cursor: pointer;
             .navbar__item{
                 display: flex;
                 align-items: center;

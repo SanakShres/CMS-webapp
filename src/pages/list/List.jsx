@@ -6,7 +6,7 @@ import "./list.scss";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Link } from "react-router-dom";
 
-const List = () => {
+const List = ({ title }) => {
   return (
     <div className="list">
       <Sidebar />
@@ -14,11 +14,11 @@ const List = () => {
         <Navbar />
         <div className="datatable__container">
           <div className="datatable__top">
-            <h1>Users</h1>
-            <Link to="/users/new" style={{ textDecoration: "none" }}>
+            <h1>{title}</h1>
+            <Link to={`/${title}/new`} style={{ textDecoration: "none" }}>
               <div className="datatable__add">
                 <AddCircleOutlineIcon className="icon" />
-                <span>Add Users</span>
+                <span>Add {title}</span>
               </div>
             </Link>
           </div>

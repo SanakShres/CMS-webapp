@@ -1,4 +1,56 @@
-// .app.dark{
-//     background-color: #111;
-//     color: rgb(156, 156, 156);
-// }
+@use "./color" as *;
+
+.app.dark{
+    background-color: $dark;
+    .sidebar{
+        background: $dark;
+        border-color: $text-primary;
+        .sidebar__top{
+            border-color: $text-primary;
+        }
+        .sidebar__center ul.sidebar__nav li{
+            &:hover{
+                background-color: $text-primary;
+            }
+            span{
+                color: $light;
+            }
+        } 
+    }
+    .navbar{
+        color: $text-light;
+        border-color: $text-primary;
+    }
+    .home__containerInner{
+        color: $light;
+        .widget{
+            background-color: $dark !important;
+        }
+        .chart__grid{
+            stroke: $text-light;
+        }
+    }
+    .table__container{
+        background-color: $text-primary;
+        .table__cell{
+            color: $light;
+        }
+    }
+    .datatable__container{
+        color: $light;
+        .datatable__grid{
+            background-color: $text-primary;
+            border: none;
+            color: $light
+        }
+    }
+    .singleItem__container{
+        color: $light;
+        .singleItem__left, .singleItem__right{
+            background-color: $dark;
+        }
+    }
+    .newItem__container .newItem__inner{
+        color: $light;
+    }
+}
