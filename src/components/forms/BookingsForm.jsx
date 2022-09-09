@@ -6,7 +6,13 @@ import Select from "react-select";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { bookingsSchema } from "../../schema";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  setDoc,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db, storage } from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
@@ -14,7 +20,7 @@ import { useNavigate } from "react-router-dom";
 const BookingsForm = ({ inputs }) => {
   const [inputImage, setInputImage] = useState(null);
   const [imgURL, setImgURL] = useState("");
-  const [imgPercent, setImgPercent] = useState(null);
+  const [imgPercent, setImgPercent] = useState(0);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
   const navigate = useNavigate();
@@ -40,6 +46,8 @@ const BookingsForm = ({ inputs }) => {
       // const imageName = "user_id"; //to store single image of same user
 
       const storageRef = ref(storage, imageName);
+      /// ref to collection of images
+      const collectionRef = doc(collection(db, "images"));
 
       const uploadTask = uploadBytesResumable(storageRef, inputImage);
 
@@ -76,6 +84,10 @@ const BookingsForm = ({ inputs }) => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setImgURL(downloadURL);
             setUploadSuccess(true);
+            setDoc(collectionRef, {
+              url: downloadURL,
+              createdAt: serverTimestamp(),
+            });
             alert("Upload Successful");
           });
         }
@@ -112,28 +124,38 @@ const BookingsForm = ({ inputs }) => {
           alt=""
         />
         <div className="formInput__img">
-          <label htmlFor="inputFile" className="upload__container">
+          <label htmlFor="bookingImage" className="upload__container">
             Browse image <DriveFolderUploadIcon />
           </label>
           <input
             {...register("image")}
             type="file"
-            id="inputFile"
+            id="bookingImage"
             onChange={(e) => {
               setInputImage(e.target.files[0]);
               setUploadSuccess(false);
+              setImgPercent(0);
             }}
             style={{ display: "none" }}
           />
           <p className="error">{errors.image?.message}</p>
         </div>
         {inputImage !== null && !uploadSuccess && (
+          <div
+            className="progress-bar"
+            style={{ width: imgPercent + "%" }}
+          ></div>
+        )}
+        {inputImage !== null && !uploadSuccess && (
           <button
             className="upload__btn"
-            disabled={imgPercent !== null && imgPercent < 100}
+            disabled={imgPercent !== 0 && imgPercent < 100}
             onClick={handleUpload}
           >
-            Upload image <CloudUploadOutlinedIcon />
+            {imgPercent !== 0 && imgPercent < 100
+              ? "Uploading..."
+              : "Upload image"}{" "}
+            <CloudUploadOutlinedIcon />
           </button>
         )}
       </div>
@@ -175,7 +197,7 @@ const BookingsForm = ({ inputs }) => {
           <div className="formBtn">
             <button
               type="submit"
-              disabled={imgPercent !== null && imgPercent < 100}
+              disabled={imgPercent !== 0 && imgPercent < 100}
             >
               Add
             </button>

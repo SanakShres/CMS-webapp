@@ -28,6 +28,7 @@
           display: flex;
           flex-direction: column;
           align-items: center;
+          // justify-content: space-between;
           gap: 30px;
           img {
             width: 200px;
@@ -60,6 +61,15 @@
                 background-color: #ece8ff;
               }
             }
+          }
+          .progress-bar{
+            height: 3px;
+            border-radius: 5px;
+            background-color: #ece8ff;
+            // margin-bottom: 15px;
+            align-self: start;
+            width: 0;
+            transition: width 350ms ease-in-out;
           }
           .upload__btn{
             padding: 10px 20px;

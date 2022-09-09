@@ -40,6 +40,7 @@ const DetailsForm = () => {
         <label className="formInput__title" htmlFor="">
           Company Location
         </label>
+
         {fields.map(({ id }, index) => {
           return (
             <div className="formInput__group" key={id}>
@@ -70,23 +71,21 @@ const DetailsForm = () => {
                 />
                 <p className="error"></p>
               </div>
-              {index === 0 ? (
+
+              <button
+                className="formBtn__btn"
+                type="button"
+                onClick={() => append({ country: "", province: "", city: "" })}
+              >
+                Add Location
+              </button>
+              {fields.length > 1 && (
                 <button
                   className="formBtn__btn"
                   type="button"
-                  onClick={() =>
-                    append({ country: "", province: "", city: "" })
-                  }
+                  onClick={() => remove(index)}
                 >
-                  Add Location
-                </button>
-              ) : (
-                <button
-                  className="formBtn__btn"
-                  type="button"
-                  onClick={() => remove({ index })}
-                >
-                  Del Location
+                  Delete
                 </button>
               )}
             </div>

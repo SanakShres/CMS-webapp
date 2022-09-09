@@ -1,0 +1,86 @@
+.gallery__upload__modal, .g_modal__overlay{
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+}
+.gallery__upload__modal .g_modal__container{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    width: 50%;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 15px 30px;
+    -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
+    box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+    border-radius: 15px;
+    .g_upload__close{
+        align-self: flex-end;
+        display: block;
+        padding: 5px;
+        font-size: 26px;
+        color: #ff0000;
+        border-radius: 50%;
+        cursor: pointer;
+        &:hover{
+            background: #fdeded;
+        }
+    }
+    .g_upload__container{
+        width: 100%;
+        height: 200px;
+        border: 1px dashed #999;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        cursor: pointer;
+        text-align: center;
+        &:hover{
+            border-color: #7451f8;
+            background-color: #ece8ff;
+        }
+        font: {
+            size: 16px;
+            weight: 600;
+        }
+        color: #999;
+        .g_upload__icon{
+            font-size: 100px;
+            color: #7451f8;
+        }
+        .g_upload__info{
+            font: {
+                size: 14px;
+                weight:400;
+            }
+            span{
+                font-weight: 600;
+                color: #7451f8;
+            }
+        }
+    }
+    .g_upload__btn{
+        align-self: center;
+        width: 150px;
+        padding: 10px;
+        border: 0;  
+        outline: 0;
+        border-radius: 5px;
+        cursor: pointer;
+        color: #fff;
+        background-color:#7451f8;
+        font-size: 14px;
+        font-weight: 800;
+        transition: 300ms ease-in-out;
+    }
+}

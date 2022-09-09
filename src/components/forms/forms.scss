@@ -33,7 +33,6 @@ form.newVenue__form{
             // width: 100%;
             display: flex;
             gap: 15px;
-            justify-content: space-between;
             margin-bottom: 30px;
             flex-wrap: wrap;
             .formInput__field{
@@ -93,7 +92,7 @@ form.newVenue__form{
                 font: {
                     size: 14px;
                     weight:400;
-                };
+                }
                 span{
                     font-weight: 600;
                     color: #7451f8;
@@ -111,6 +110,7 @@ form.newVenue__form{
                 height: 70px;
                 width: 100px;
                 object-fit: cover;
+                border-radius: 5px;
             }
             .upload__images__details{
                 flex: 1;
@@ -134,12 +134,23 @@ form.newVenue__form{
                     }
                 }
             }
-            .upload__images__remove{
-                cursor: pointer;
-                font-size: 24px;
-                font-weight: 800;
-                color: #ff0000;
-            }   
+            .upload__images__icon{
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: 350ms ease-in-out;
+                .icon{
+                    cursor: pointer;
+                    font-size: 20px;
+                    font-weight: 800;
+                } 
+                &.remove:hover{
+                    background-color: #fdeded;
+                }  
+            }
         }
         .upload__btn{
             float: right;
@@ -165,6 +176,7 @@ form.newVenue__form{
         width: 100%;
         display: flex;
         justify-content: center;
+        padding-top: 30px;
         .formBtn__submit{
             width: 150px;
             padding: 10px;
@@ -176,7 +188,6 @@ form.newVenue__form{
             background-color:#7451f8;
             font-size: 14px;
             font-weight: 800;
-            margin-top: 15px;
             transition: 300ms ease-in-out;
             &:hover{
                 transform: scale(0.95);

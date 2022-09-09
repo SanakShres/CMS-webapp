@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import DetailsForm from "../../components/forms/DetailsForm";
+import Gallery from "../../components/gallery/Gallery";
 import ServicesForm from "../../components/forms/ServicesForm";
 import { Navbar } from "../../components/navbar/Navbar";
 import Sidebar from "../../components/sidebar/Sidebar";
 import "./newVenue.scss";
+import RulesPolicy from "../../components/forms/RulesPolicy";
 
 const NewVenue = () => {
   const [toggleForm, setToggleForm] = useState(1);
@@ -76,6 +78,25 @@ const NewVenue = () => {
             >
               <h3>Company Services</h3>
               <ServicesForm />
+            </div>
+            <div
+              className={
+                toggleForm === 3
+                  ? "newVenue__formHolder active__form"
+                  : "newVenue__formHolder"
+              }
+            >
+              <Gallery />
+            </div>
+            <div
+              className={
+                toggleForm === 5
+                  ? "newVenue__formHolder active__form"
+                  : "newVenue__formHolder"
+              }
+            >
+              <h3>Company Rules and Policies</h3>
+              <RulesPolicy />
             </div>
           </div>
         </div>

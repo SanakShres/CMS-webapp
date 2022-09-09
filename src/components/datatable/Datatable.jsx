@@ -5,7 +5,13 @@ import { userColumns, bookingColumns } from "../../dataTableSource";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Link, useLocation } from "react-router-dom";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
+import {
+  collection,
+  // getDocs,
+  doc,
+  deleteDoc,
+  onSnapshot,
+} from "firebase/firestore";
 import { db } from "../../firebase";
 
 const Datatable = () => {
@@ -22,27 +28,63 @@ const Datatable = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      let tableList = [];
-      try {
-        const querySnapshot = await getDocs(collection(db, location.pathname));
-        querySnapshot.forEach((doc) => {
+    // const fetchData = async () => {
+    //   let tableList = [];
+    //   try {
+    //     const querySnapshot = await getDocs(collection(db, location.pathname));
+    //     querySnapshot.forEach((doc) => {
+    //       tableList.push({
+    //         id: doc.id,
+    //         ...doc.data(),
+    //         eventDate:
+    //           doc.data().eventDate &&
+    //           formatDate(doc.data().eventDate.seconds * 1000),
+    //       });
+    //     });
+    //     setTableData(tableList);
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    // };
+    // fetchData();
+
+    /// Listen real time
+
+    const unsub = onSnapshot(
+      collection(db, location.pathname),
+      (snapShot) => {
+        let tableList = [];
+        snapShot.forEach((doc) => {
           tableList.push({
             id: doc.id,
             ...doc.data(),
             eventDate:
               doc.data().eventDate &&
-              new Date(doc.data().eventDate.seconds * 1000),
+              formatDate(doc.data().eventDate.seconds * 1000),
           });
         });
         setTableData(tableList);
-      } catch (err) {
-        console.log(err);
+      },
+      (error) => {
+        console.log(error);
       }
+    );
+    return () => {
+      unsub();
     };
-    fetchData();
   }, [location.pathname]);
-  console.log(tableData);
+
+  function formatDate(date) {
+    var d = new Date(date),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  }
 
   const actionColumn = [
     {
