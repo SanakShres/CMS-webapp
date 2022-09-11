@@ -10,10 +10,10 @@ import Login from "./pages/login/Login";
 import List from "./pages/list/List";
 import SingleItem from "./pages/singleItem/SingleItem";
 import New from "./pages/new/New";
+import NewVenue from "./pages/newVenue/NewVenue";
 import "./styles/dark.scss";
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
-import NewVenue from "./pages/newVenue/NewVenue";
 import { AuthContext } from "./context/AuthContext";
 
 function App() {
