@@ -15,6 +15,7 @@ import "./styles/dark.scss";
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
 import { AuthContext } from "./context/AuthContext";
+import TestBlock from "./pages/test/TestBlock";
 
 function App() {
   const { darkMode } = useContext(DarkModeContext);
@@ -25,8 +26,8 @@ function App() {
   };
 
   return (
-    <div className={darkMode ? "app dark" : "app"}>
-      <Router>
+    <Router>
+      <div className={darkMode ? "app dark" : "app"}>
         <Routes>
           <Route path="/">
             <Route
@@ -43,12 +44,12 @@ function App() {
                 index
                 element={
                   <RequireAuth>
-                    <List title="Users" />
+                    <List title="users" />
                   </RequireAuth>
                 }
               />
               <Route
-                path=":userId"
+                path=":id"
                 element={
                   <RequireAuth>
                     <SingleItem />
@@ -63,13 +64,21 @@ function App() {
                   </RequireAuth>
                 }
               />
+              <Route
+                path="update/:id"
+                element={
+                  <RequireAuth>
+                    <New title="Update User" />
+                  </RequireAuth>
+                }
+              />
             </Route>
             <Route path="venues">
               <Route
                 index
                 element={
                   <RequireAuth>
-                    <List title="Venues" />
+                    <List title="venues" />
                   </RequireAuth>
                 }
               />
@@ -95,7 +104,7 @@ function App() {
                 index
                 element={
                   <RequireAuth>
-                    <List title="Bookings" />
+                    <List title="bookings" />
                   </RequireAuth>
                 }
               />
@@ -115,11 +124,20 @@ function App() {
                   </RequireAuth>
                 }
               />
+              <Route
+                path="update/:id"
+                element={
+                  <RequireAuth>
+                    <New title="Update Booking" />
+                  </RequireAuth>
+                }
+              />
             </Route>
+            <Route path="/test" element={<TestBlock />} />
           </Route>
         </Routes>
-      </Router>
-    </div>
+      </div>
+    </Router>
   );
 }
 

@@ -7,58 +7,91 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { usersSchema } from "../../schema";
 import { doc, collection, setDoc, serverTimestamp } from "firebase/firestore";
-import { auth, db, storage } from "../../firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { db, storage } from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  fetchUser,
+  addUser,
+  updateUser,
+} from "../../redux/features/user/userActions";
+import { isEmptyObject } from "jquery";
 
 const UsersForm = ({ inputs }) => {
-  const [inputImage, setInputImage] = useState(null);
-  const [imgURL, setImgURL] = useState("");
-  const [imgPercent, setImgPercent] = useState(0);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const user = useSelector((state) => state.user.item);
+  const [allowRender, setAllowRender] = useState(false);
+  const [imgFile, setImgFile] = useState({
+    input: null,
+    url: "",
+    uploadProgress: 0,
+  });
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { id } = useParams();
 
   const {
     control,
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitSuccessful },
+    formState: { errors },
   } = useForm({
+    defaultValues: {},
     resolver: yupResolver(usersSchema),
   });
 
   useEffect(() => {
-    reset();
-    setInputImage(null);
-  }, [isSubmitSuccessful, reset]);
+    try {
+      if (id) {
+        dispatch(fetchUser(id));
+      } else {
+        setAllowRender(true);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, [dispatch, id]);
+
+  console.log("user", user);
+
+  useEffect(() => {
+    try {
+      if (id && !isEmptyObject(user)) {
+        reset(user);
+        setAllowRender(true);
+      } else reset();
+    } catch (err) {
+      console.log(err);
+    }
+  }, [reset, user, id]);
+
+  // useEffect(() => {
+  //   reset();
+  //   setImgFile((prevState) => ({...prevState, input:null}))
+  // }, [isSubmitSuccessful, reset]);
 
   const handleUpload = () => {
     const uploadFile = () => {
-      const imageName = new Date().getTime() + inputImage.name;
+      const imageName = new Date().getTime() + imgFile.input.name;
       // const imageName = "user_id"; //to store single image of same user
 
       const storageRef = ref(storage, imageName);
       /// ref to collection of images
       const collectionRef = doc(collection(db, "images"));
 
-      const uploadTask = uploadBytesResumable(storageRef, inputImage);
-
-      // Register three observers:
-      // 1. 'state_changed' observer, called any time the state changes
-      // 2. Error observer, called on failure
-      // 3. Completion observer, called on successful completion
+      const uploadTask = uploadBytesResumable(storageRef, imgFile.input);
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          // Observe state change events such as progress, pause, and resume
-          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           console.log("Upload is " + progress + "% done");
-          setImgPercent(progress);
+          setImgFile((prevState) => ({
+            ...prevState,
+            uploadProgress: progress,
+          }));
           switch (snapshot.state) {
             case "paused":
               console.log("Upload is paused");
@@ -74,11 +107,8 @@ const UsersForm = ({ inputs }) => {
           console.log(error);
         },
         () => {
-          // Handle successful uploads on complete
-          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            setImgURL(downloadURL);
-            setUploadSuccess(true);
+            setImgFile((prevState) => ({ ...prevState, url: downloadURL }));
             setDoc(collectionRef, {
               url: downloadURL,
               createdAt: serverTimestamp(),
@@ -91,121 +121,136 @@ const UsersForm = ({ inputs }) => {
     uploadFile();
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = (data) => {
     // alert("SUCCESS!! :-)\n\n" + JSON.stringify(data, null, 4));
-
     try {
-      const res = await createUserWithEmailAndPassword(
-        auth,
-        data.email,
-        data.password
-      );
-      await setDoc(doc(db, "users", res.user.uid), {
-        ...data,
-        image: imgURL,
-        timeStamp: serverTimestamp(),
-      });
+      if (id) {
+        dispatch(
+          updateUser(
+            {
+              ...data,
+              image: imgFile.url !== "" ? imgFile.url : user.image,
+            },
+            id
+          )
+        );
+      } else dispatch(addUser({ ...data, image: imgFile.url }));
       setTimeout(() => {
-        navigate(-1);
-      }, 1000);
+        navigate("/users");
+      }, 500);
     } catch (err) {
       console.log(err);
     }
   };
 
   return (
-    <div className="newItem__bottom">
-      <div className="newItem__left">
-        <img
-          src={
-            inputImage
-              ? URL.createObjectURL(inputImage)
-              : "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg"
-          }
-          alt=""
-        />
-        <div className="formInput__img">
-          <label htmlFor="userImage" className="upload__container">
-            Browse image <DriveFolderUploadIcon />
-          </label>
-          <input
-            {...register("image")}
-            type="file"
-            id="userImage"
-            onChange={(e) => {
-              setInputImage(e.target.files[0]);
-              setUploadSuccess(false);
-              setImgPercent(0);
-            }}
-            style={{ display: "none" }}
-          />
-          <p className="error">{errors.image?.message}</p>
-        </div>
-        {inputImage !== null && !uploadSuccess && (
-          <div
-            className="progress-bar"
-            style={{ width: imgPercent + "%" }}
-          ></div>
-        )}
-        {inputImage !== null && !uploadSuccess && (
-          <button
-            className="upload__btn"
-            disabled={imgPercent !== 0 && imgPercent < 100}
-            onClick={handleUpload}
-          >
-            {imgPercent !== 0 && imgPercent < 100
-              ? "Uploading..."
-              : "Upload image"}{" "}
-            <CloudUploadOutlinedIcon />
-          </button>
-        )}
-      </div>
-      <div className="newItem__right">
-        <form className="newItem__form" onSubmit={handleSubmit(onSubmit)}>
-          {inputs.map((input) =>
-            input.type === "multiselect" ? (
-              <div className="formInput" key={input.id}>
-                <label htmlFor="">{input.label}</label>
-                <Controller
-                  control={control}
-                  name={input.name}
-                  render={({ field: { onChange, ref } }) => (
-                    <Select
-                      inputRef={ref}
-                      onChange={(val) => onChange(val.map((c) => c.value))}
-                      options={input.options}
-                      isMulti
-                      className="formInput__select"
-                      classNamePrefix="select"
-                    />
-                  )}
-                />
-                <p className="error">{errors[input.name]?.message}</p>
-              </div>
+    <>
+      {allowRender && (
+        <div className="newItem__bottom">
+          <div className="newItem__left">
+            {id && user.image ? (
+              <img src={user.image} alt="" />
             ) : (
-              <div className="formInput" key={input.id}>
-                <label htmlFor="">{input.label}</label>
-                <input
-                  className="formInput__input"
-                  {...register(input.name)}
-                  type={input.type}
-                  placeholder={input.placeholder && input.placeholder}
-                />
-                <p className="error">{errors[input.name]?.message}</p>
-              </div>
-            )
-          )}
-          <div className="formBtn">
-            <button
-              type="submit"
-              disabled={imgPercent !== 0 && imgPercent < 100}
-            >
-              Add
-            </button>
+              <img
+                src={
+                  imgFile.input
+                    ? URL.createObjectURL(imgFile.input)
+                    : "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg"
+                }
+                alt=""
+              />
+            )}
+            <div className="formInput__img">
+              <label htmlFor="userImage" className="upload__container">
+                Browse image <DriveFolderUploadIcon />
+              </label>
+              <input
+                {...register("image")}
+                type="file"
+                id="userImage"
+                onChange={(e) => {
+                  setImgFile({
+                    input: e.target.files[0],
+                    url: "",
+                    uploadProgress: 0,
+                  });
+                }}
+                style={{ display: "none" }}
+              />
+              <p className="error">{errors.image?.message}</p>
+            </div>
+            {imgFile.input !== null && imgFile.url === "" && (
+              <div
+                className="progress-bar"
+                style={{ width: imgFile.uploadProgress + "%" }}
+              ></div>
+            )}
+            {imgFile.input !== null && imgFile.url === "" && (
+              <button
+                type="button"
+                className="upload__btn"
+                disabled={
+                  imgFile.uploadProgress !== 0 && imgFile.uploadProgress < 100
+                }
+                onClick={handleUpload}
+              >
+                {imgFile.uploadProgress !== 0 && imgFile.uploadProgress < 100
+                  ? "Uploading..."
+                  : "Upload image"}{" "}
+                <CloudUploadOutlinedIcon />
+              </button>
+            )}
           </div>
-        </form>
-      </div>
-    </div>
+          <div className="newItem__right">
+            <form className="newItem__form" onSubmit={handleSubmit(onSubmit)}>
+              {inputs.map((input) =>
+                input.type === "multiselect" ? (
+                  <div className="formInput" key={input.id}>
+                    <label htmlFor="">{input.label}</label>
+                    <Controller
+                      control={control}
+                      name={input.name}
+                      render={({ field: { onChange, ref } }) => (
+                        <Select
+                          inputRef={ref}
+                          onChange={(val) => onChange(val.map((c) => c.value))}
+                          options={input.options}
+                          isMulti
+                          className="formInput__select"
+                          classNamePrefix="select"
+                        />
+                      )}
+                    />
+                    <p className="error">{errors[input.name]?.message}</p>
+                  </div>
+                ) : (
+                  <div className="formInput" key={input.id}>
+                    <label htmlFor="">{input.label}</label>
+                    <input
+                      className="formInput__input"
+                      {...register(input.name)}
+                      type={input.type}
+                      placeholder={input.placeholder && input.placeholder}
+                    />
+                    <p className="error">{errors[input.name]?.message}</p>
+                  </div>
+                )
+              )}
+              <div className="formBtn">
+                <button
+                  type="submit"
+                  disabled={
+                    imgFile.uploadProgress !== 0 && imgFile.uploadProgress < 100
+                  }
+                >
+                  {id ? "Update" : "Add"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

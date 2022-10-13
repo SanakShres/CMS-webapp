@@ -1,90 +1,44 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import "./datatable.scss";
 import { DataGrid } from "@mui/x-data-grid";
 import { userColumns, bookingColumns } from "../../dataTableSource";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Link, useLocation } from "react-router-dom";
-import {
-  collection,
-  // getDocs,
-  doc,
-  deleteDoc,
-  onSnapshot,
-} from "firebase/firestore";
-import { db } from "../../firebase";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchUsers, removeUser } from "../../redux/features/user/userActions";
+import { fetchBookings, removeBooking } from "../../redux/features/booking/bookingActions";
 
 const Datatable = () => {
-  const [tableData, setTableData] = useState([]);
+  const users = useSelector((state) => state.user.items);
+  const bookings = useSelector((state) => state.booking.items)
+  const dispatch = useDispatch();
   const location = useLocation();
 
-  const handleDelete = async (id) => {
-    try {
-      await deleteDoc(doc(db, location.pathname, id));
-      setTableData(tableData.filter((data) => data.id !== id));
-    } catch (err) {
-      console.log(err);
+  useEffect(() => {
+    if (location.pathname === "/users") {
+      dispatch(fetchUsers());
+    } else if (location.pathname === "/bookings") {
+      dispatch(fetchBookings());
+    } else if (location.pathname === "/venues") {
+      dispatch(fetchUsers());
+    } else {
+      console.log(location.pathname);
+    }
+  }, [dispatch, location.pathname]);
+
+  const handleDelete = (id) => {
+    if (location.pathname === "/users") {
+      dispatch(removeUser(id));
+    } else if (location.pathname === "/bookings") {
+      dispatch(removeBooking(id));
+    } else if (location.pathname === "/venues") {
+      dispatch(removeUser(id));
+    } else {
+      console.log(location.pathname);
     }
   };
-
-  useEffect(() => {
-    // const fetchData = async () => {
-    //   let tableList = [];
-    //   try {
-    //     const querySnapshot = await getDocs(collection(db, location.pathname));
-    //     querySnapshot.forEach((doc) => {
-    //       tableList.push({
-    //         id: doc.id,
-    //         ...doc.data(),
-    //         eventDate:
-    //           doc.data().eventDate &&
-    //           formatDate(doc.data().eventDate.seconds * 1000),
-    //       });
-    //     });
-    //     setTableData(tableList);
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-    // };
-    // fetchData();
-
-    /// Listen real time
-
-    const unsub = onSnapshot(
-      collection(db, location.pathname),
-      (snapShot) => {
-        let tableList = [];
-        snapShot.forEach((doc) => {
-          tableList.push({
-            id: doc.id,
-            ...doc.data(),
-            eventDate:
-              doc.data().eventDate &&
-              formatDate(doc.data().eventDate.seconds * 1000),
-          });
-        });
-        setTableData(tableList);
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-    return () => {
-      unsub();
-    };
-  }, [location.pathname]);
-
-  function formatDate(date) {
-    var d = new Date(date),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear();
-
-    if (month.length < 2) month = "0" + month;
-    if (day.length < 2) day = "0" + day;
-
-    return [year, month, day].join("-");
-  }
 
   const actionColumn = [
     {
@@ -97,6 +51,14 @@ const Datatable = () => {
             <Link to="/users/test" style={{ textDecoration: "none" }}>
               <div className="cellAction__icon">
                 <VisibilityIcon className="icon" />
+              </div>
+            </Link>
+            <Link
+              to={`${location.pathname}/update/${params.row.id}`}
+              style={{ textDecoration: "none" }}
+            >
+              <div className="cellAction__icon">
+                <EditIcon className="icon" />
               </div>
             </Link>
             <div
@@ -115,7 +77,7 @@ const Datatable = () => {
       {location.pathname === "/users" && (
         <DataGrid
           autoHeight
-          rows={tableData}
+          rows={users}
           columns={userColumns.concat(actionColumn)}
           pageSize={8}
           rowsPerPageOptions={[8]}
@@ -126,7 +88,7 @@ const Datatable = () => {
       {location.pathname === "/bookings" && (
         <DataGrid
           autoHeight
-          rows={tableData}
+          rows={bookings}
           columns={bookingColumns.concat(actionColumn)}
           pageSize={8}
           rowsPerPageOptions={[8]}
@@ -137,7 +99,7 @@ const Datatable = () => {
       {location.pathname === "/venues" && (
         <DataGrid
           autoHeight
-          rows={tableData}
+          rows={bookings}
           columns={bookingColumns.concat(actionColumn)}
           pageSize={8}
           rowsPerPageOptions={[8]}

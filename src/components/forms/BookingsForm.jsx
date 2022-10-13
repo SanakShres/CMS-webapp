@@ -6,50 +6,81 @@ import Select from "react-select";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { bookingsSchema } from "../../schema";
-import {
-  collection,
-  doc,
-  setDoc,
-  addDoc,
-  serverTimestamp,
-} from "firebase/firestore";
+import { collection, doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db, storage } from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  fetchBooking,
+  addBooking,
+  updateBooking,
+} from "../../redux/features/booking/bookingActions";
+import { isEmptyObject } from "jquery";
+import moment from "moment";
 
 const BookingsForm = ({ inputs }) => {
-  const [inputImage, setInputImage] = useState(null);
-  const [imgURL, setImgURL] = useState("");
-  const [imgPercent, setImgPercent] = useState(0);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const booking = useSelector((state) => state.booking.item);
+  const [formRender, setFormRender] = useState(false);
+  const [imgFile, setImgFile] = useState({
+    input: null,
+    url: "",
+    uploadProgress: 0,
+  });
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { id } = useParams();
 
   const {
     control,
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitSuccessful },
+    formState: { errors },
   } = useForm({
     resolver: yupResolver(bookingsSchema),
   });
 
   useEffect(() => {
-    reset();
-    setInputImage(null);
-  }, [isSubmitSuccessful, reset]);
+    try {
+      if (id) {
+        dispatch(fetchBooking(id));
+      } else {
+        setFormRender(true);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, [dispatch, id]);
+
+  console.log("booking", booking);
+
+  useEffect(() => {
+    if (id && !isEmptyObject(booking)) {
+      const date = moment(booking.eventDate.seconds * 1000).format(
+        "YYYY-MM-DD"
+      );
+      reset({ ...booking, eventDate: date });
+      setFormRender(true);
+    } else reset();
+  }, [booking, id, reset]);
+
+  // useEffect(() => {
+  //   reset();
+  //   setImgFile((prevState) => ({...prevState, input:null}))
+  // }, [isSubmitSuccessful, reset]);
 
   const handleUpload = () => {
     const uploadFile = () => {
-      const imageName = new Date().getTime() + inputImage.name;
+      const imageName = new Date().getTime() + imgFile.input.name;
       // const imageName = "user_id"; //to store single image of same user
 
       const storageRef = ref(storage, imageName);
       /// ref to collection of images
       const collectionRef = doc(collection(db, "images"));
 
-      const uploadTask = uploadBytesResumable(storageRef, inputImage);
+      const uploadTask = uploadBytesResumable(storageRef, imgFile.input);
 
       // Register three observers:
       // 1. 'state_changed' observer, called any time the state changes
@@ -63,7 +94,10 @@ const BookingsForm = ({ inputs }) => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           console.log("Upload is " + progress + "% done");
-          setImgPercent(progress);
+          setImgFile((prevState) => ({
+            ...prevState,
+            uploadProgress: progress,
+          }));
           switch (snapshot.state) {
             case "paused":
               console.log("Upload is paused");
@@ -82,8 +116,10 @@ const BookingsForm = ({ inputs }) => {
           // Handle successful uploads on complete
           // For instance, get the download URL: https://firebasestorage.googleapis.com/...
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            setImgURL(downloadURL);
-            setUploadSuccess(true);
+            setImgFile((prevState) => ({
+              ...prevState,
+              url: downloadURL,
+            }));
             setDoc(collectionRef, {
               url: downloadURL,
               createdAt: serverTimestamp(),
@@ -99,13 +135,19 @@ const BookingsForm = ({ inputs }) => {
   const onSubmit = async (data) => {
     // alert("SUCCESS!! :-)\n\n" + JSON.stringify(data, null, 4));
     try {
-      await addDoc(collection(db, "bookings"), {
-        ...data,
-        image: imgURL,
-        timeStamp: serverTimestamp(),
-      });
+      if (id) {
+        dispatch(
+          updateBooking(
+            {
+              ...data,
+              image: imgFile.url !== "" ? imgFile.url : booking.image,
+            },
+            id
+          )
+        );
+      } else dispatch(addBooking({ ...data, image: imgFile.url }));
       setTimeout(() => {
-        navigate(-1);
+        navigate("/bookings");
       }, 1000);
     } catch (err) {
       console.log(err);
@@ -113,98 +155,114 @@ const BookingsForm = ({ inputs }) => {
   };
 
   return (
-    <div className="newItem__bottom">
-      <div className="newItem__left">
-        <img
-          src={
-            inputImage
-              ? URL.createObjectURL(inputImage)
-              : "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg"
-          }
-          alt=""
-        />
-        <div className="formInput__img">
-          <label htmlFor="bookingImage" className="upload__container">
-            Browse image <DriveFolderUploadIcon />
-          </label>
-          <input
-            {...register("image")}
-            type="file"
-            id="bookingImage"
-            onChange={(e) => {
-              setInputImage(e.target.files[0]);
-              setUploadSuccess(false);
-              setImgPercent(0);
-            }}
-            style={{ display: "none" }}
-          />
-          <p className="error">{errors.image?.message}</p>
-        </div>
-        {inputImage !== null && !uploadSuccess && (
-          <div
-            className="progress-bar"
-            style={{ width: imgPercent + "%" }}
-          ></div>
-        )}
-        {inputImage !== null && !uploadSuccess && (
-          <button
-            className="upload__btn"
-            disabled={imgPercent !== 0 && imgPercent < 100}
-            onClick={handleUpload}
-          >
-            {imgPercent !== 0 && imgPercent < 100
-              ? "Uploading..."
-              : "Upload image"}{" "}
-            <CloudUploadOutlinedIcon />
-          </button>
-        )}
-      </div>
-      <div className="newItem__right">
-        <form className="newItem__form" onSubmit={handleSubmit(onSubmit)}>
-          {inputs.map((input) =>
-            input.type === "multiselect" ? (
-              <div className="formInput" key={input.id}>
-                <label htmlFor="">{input.label}</label>
-                <Controller
-                  control={control}
-                  name={input.name}
-                  render={({ field: { onChange, ref } }) => (
-                    <Select
-                      // inputRef={ref}
-                      onChange={(val) => onChange(val.map((c) => c.value))}
-                      options={input.options}
-                      isMulti
-                      className="formInput__select"
-                      classNamePrefix="select"
-                    />
-                  )}
-                />
-                <p className="error">{errors[input.name]?.message}</p>
-              </div>
+    <>
+      {formRender && (
+        <div className="newItem__bottom">
+          <div className="newItem__left">
+            {id && booking.image ? (
+              <img src={booking.image} alt="" />
             ) : (
-              <div className="formInput" key={input.id}>
-                <label htmlFor="">{input.label}</label>
-                <input
-                  className="formInput__input"
-                  {...register(input.name)}
-                  type={input.type}
-                  placeholder={input.placeholder && input.placeholder}
-                />
-                <p className="error">{errors[input.name]?.message}</p>
-              </div>
-            )
-          )}
-          <div className="formBtn">
-            <button
-              type="submit"
-              disabled={imgPercent !== 0 && imgPercent < 100}
-            >
-              Add
-            </button>
+              <img
+                src={
+                  imgFile.input
+                    ? URL.createObjectURL(imgFile.input)
+                    : "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg"
+                }
+                alt=""
+              />
+            )}
+            <div className="formInput__img">
+              <label htmlFor="bookingImage" className="upload__container">
+                Browse image <DriveFolderUploadIcon />
+              </label>
+              <input
+                {...register("image")}
+                type="file"
+                id="bookingImage"
+                onChange={(e) => {
+                  setImgFile({
+                    input: e.target.files[0],
+                    url: "",
+                    uploadProgress: 0,
+                  });
+                }}
+                style={{ display: "none" }}
+              />
+              <p className="error">{errors.image?.message}</p>
+            </div>
+            {imgFile.input !== null && imgFile.url === "" && (
+              <div
+                className="progress-bar"
+                style={{ width: imgFile.uploadProgress + "%" }}
+              ></div>
+            )}
+            {imgFile.input !== null && imgFile.url === "" && (
+              <button
+                className="upload__btn"
+                disabled={
+                  imgFile.uploadProgress !== 0 && imgFile.uploadProgress < 100
+                }
+                onClick={handleUpload}
+              >
+                {imgFile.uploadProgress !== 0 && imgFile.uploadProgress < 100
+                  ? "Uploading..."
+                  : "Upload image"}{" "}
+                <CloudUploadOutlinedIcon />
+              </button>
+            )}
           </div>
-        </form>
-      </div>
-    </div>
+          <div className="newItem__right">
+            <form className="newItem__form" onSubmit={handleSubmit(onSubmit)}>
+              {inputs.map((input) =>
+                input.type === "multiselect" ? (
+                  <div className="formInput" key={input.id}>
+                    <label htmlFor="">{input.label}</label>
+                    <Controller
+                      control={control}
+                      name={input.name}
+                      render={({ field: { onChange, ref, value } }) => (
+                        <Select
+                          ref={ref}
+                          // onChange={(val) => onChange(val.map((c) => c.value))}
+                          value={value}
+                          onChange={onChange}
+                          options={input.options}
+                          isMulti
+                          className="formInput__select"
+                          classNamePrefix="select"
+                        />
+                      )}
+                    />
+                    <p className="error">{errors[input.name]?.message}</p>
+                  </div>
+                ) : (
+                  <div className="formInput" key={input.id}>
+                    <label htmlFor="">{input.label}</label>
+                    <input
+                      className="formInput__input"
+                      {...register(input.name)}
+                      type={input.type}
+                      placeholder={input.placeholder && input.placeholder}
+                    />
+                    <p className="error">{errors[input.name]?.message}</p>
+                  </div>
+                )
+              )}
+              <div className="formBtn">
+                <button
+                  type="submit"
+                  disabled={
+                    imgFile.uploadProgress !== 0 && imgFile.uploadProgress < 100
+                  }
+                >
+                  Add
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

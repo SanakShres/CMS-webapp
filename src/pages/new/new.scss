@@ -64,12 +64,12 @@
           }
           .progress-bar{
             height: 3px;
-            border-radius: 5px;
-            background-color: #ece8ff;
+            border-radius: 15px;
+            background-color: #7451f8;
             // margin-bottom: 15px;
             align-self: start;
             width: 0;
-            transition: width 350ms ease-in-out;
+            transition: width 400ms ease-in-out;
           }
           .upload__btn{
             padding: 10px 20px;
